@@ -98,7 +98,16 @@ func FetchArticle(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error()).SetInternal(err)
 	}
 
+	var totalArticles int64
+	post := new(domain.Post)
+	db.ConnectGorm().Find(post).Count(&totalArticles)
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
+		"pagination": map[string]interface{}{
+			"limit":      limit,
+			"pages":      page,
+			"total_item": totalArticles,
+		},
 		"status": "success",
 		"data":   articles,
 	})
